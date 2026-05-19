@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 480" width="1000" height="480" font-family="system-ui, -apple-system, sans-serif">
+  <style>
+    .panel { fill: #f7f5f2; stroke: #1a2e4f; stroke-width: 2; rx: 12; }
+    .panel-local { fill: #fef6e3; stroke: #e8b04a; stroke-width: 3; }
+    .panel-cloud { fill: #eaf2ff; stroke: #4a78c7; stroke-width: 2; }
+    .label-title { font-size: 16px; font-weight: 700; fill: #0e1b2c; }
+    .label-sub { font-size: 12px; fill: #4a4a4a; }
+    .label-stat { font-size: 13px; font-weight: 600; fill: #1a6b32; }
+    .label-bad { font-size: 13px; font-weight: 600; fill: #b03030; }
+    .arrow { stroke: #1a2e4f; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+    .arrow-cheap { stroke: #1a6b32; stroke-width: 2.5; fill: none; marker-end: url(#arrowg); }
+    .arrow-expensive { stroke: #b03030; stroke-width: 2; fill: none; stroke-dasharray: 6 4; marker-end: url(#arrowr); }
+    .section { font-size: 20px; font-weight: 700; fill: #0e1b2c; }
+  </style>
+  <defs>
+    <marker id="arrow"  viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#1a2e4f"/></marker>
+    <marker id="arrowg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#1a6b32"/></marker>
+    <marker id="arrowr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#b03030"/></marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="500" y="32" text-anchor="middle" class="section">The hybrid approach to AI agents</text>
+  <text x="500" y="54" text-anchor="middle" class="label-sub">Specialist local models for dedicated tasks. Big cloud LLM for the reasoning that needs it.</text>
+
+  <!-- ===== Top row: OLD WAY (everything to cloud) ===== -->
+  <text x="60" y="100" class="label-title" fill="#b03030">Pure-cloud (status quo)</text>
+
+  <!-- screenshot -->
+  <rect x="40"  y="120" width="160" height="80" class="panel" rx="12"/>
+  <text x="120" y="148" text-anchor="middle" class="label-title">Screenshot</text>
+  <text x="120" y="170" text-anchor="middle" class="label-sub">"Click the Submit button"</text>
+  <text x="120" y="188" text-anchor="middle" class="label-sub">~2 MB PNG</text>
+
+  <!-- arrow to cloud -->
+  <path d="M 200 160 L 410 160" class="arrow-expensive"/>
+  <text x="305" y="148" text-anchor="middle" class="label-bad">every call</text>
+  <text x="305" y="180" text-anchor="middle" class="label-bad">~1500 multimodal tokens</text>
+
+  <!-- cloud LLM (the only thing that does work) -->
+  <rect x="410" y="120" width="220" height="80" class="panel-cloud" rx="12"/>
+  <text x="520" y="148" text-anchor="middle" class="label-title">GPT-4V / Claude Vision</text>
+  <text x="520" y="170" text-anchor="middle" class="label-sub">decides bbox + plans next action</text>
+  <text x="520" y="188" text-anchor="middle" class="label-bad">$0.01–0.05 / call · 800ms–2s</text>
+
+  <!-- arrow to action -->
+  <path d="M 630 160 L 840 160" class="arrow"/>
+  <text x="735" y="148" text-anchor="middle" class="label-sub">click coords + action</text>
+
+  <!-- action -->
+  <rect x="840" y="120" width="120" height="80" class="panel" rx="12"/>
+  <text x="900" y="148" text-anchor="middle" class="label-title">click</text>
+  <text x="900" y="180" text-anchor="middle" class="label-sub">in the browser</text>
+
+  <!-- separator -->
+  <line x1="40" y1="240" x2="960" y2="240" stroke="#cccccc" stroke-width="1" stroke-dasharray="3 3"/>
+
+  <!-- ===== Bottom row: HYBRID ===== -->
+  <text x="60" y="280" class="label-title" fill="#1a6b32">Hybrid (with browserground)</text>
+
+  <!-- screenshot -->
+  <rect x="40"  y="310" width="160" height="120" class="panel" rx="12"/>
+  <text x="120" y="338" text-anchor="middle" class="label-title">Screenshot</text>
+  <text x="120" y="360" text-anchor="middle" class="label-sub">"Click the Submit button"</text>
+
+  <!-- branch 1: screenshot to LOCAL grounder -->
+  <path d="M 200 350 L 410 350" class="arrow-cheap"/>
+  <text x="305" y="338" text-anchor="middle" class="label-stat">local · MLX · 1.8s</text>
+  <text x="305" y="370" text-anchor="middle" class="label-stat">$0 · ~200 tokens out</text>
+
+  <!-- local model: browserground -->
+  <rect x="410" y="310" width="220" height="80" class="panel-local" rx="12"/>
+  <text x="520" y="338" text-anchor="middle" class="label-title">browserground (2 B local)</text>
+  <text x="520" y="360" text-anchor="middle" class="label-sub">screenshot + target → bbox JSON</text>
+  <text x="520" y="378" text-anchor="middle" class="label-stat">{"bbox_2d": [344, 612, 478, 658]}</text>
+
+  <!-- branch 2: bbox to cloud LLM -->
+  <path d="M 630 350 L 760 350" class="arrow"/>
+  <text x="695" y="338" text-anchor="middle" class="label-sub">just text</text>
+  <text x="695" y="370" text-anchor="middle" class="label-sub">~40 tokens</text>
+
+  <!-- cloud LLM (for planning only) -->
+  <rect x="760" y="310" width="200" height="120" class="panel-cloud" rx="12"/>
+  <text x="860" y="338" text-anchor="middle" class="label-title">Cloud LLM</text>
+  <text x="860" y="360" text-anchor="middle" class="label-sub">plans, reasons, orchestrates</text>
+  <text x="860" y="380" text-anchor="middle" class="label-stat">10–30× fewer tokens billed</text>
+
+  <!-- Bottom callout -->
+  <text x="500" y="460" text-anchor="middle" class="label-sub">
+    The grounding step doesn't need GPT-4 to "decide" — it needs a specialist that knows pixels. Use both.
+  </text>
+</svg>

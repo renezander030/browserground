@@ -1,0 +1,65 @@
+{
+  "name": "browserground",
+  "version": "0.1.2",
+  "description": "Local UI-grounding specialist for hybrid AI agents. Screenshot + text target \u2192 strict JSON bbox. Qwen3-VL-2B LoRA. Drop-in for Claude Code, Codex, browser-use, Skyvern. Cuts GPT-4V cost & latency on click grounding.",
+  "type": "module",
+  "bin": {
+    "browserground": "./bin/browserground.js"
+  },
+  "scripts": {
+    "postinstall": "node scripts/postinstall.js",
+    "test": "node test/cli.test.js"
+  },
+  "files": [
+    "bin/",
+    "scripts/",
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "ui-grounding",
+    "screen-grounding",
+    "screenshot",
+    "bbox",
+    "click-grounding",
+    "hybrid-ai",
+    "compound-ai",
+    "specialist-model",
+    "slm",
+    "local-llm",
+    "edge-ai",
+    "cost-effective-ai",
+    "browser-agent",
+    "computer-use",
+    "claude-computer-use",
+    "claude-code",
+    "codex",
+    "browser-use",
+    "skyvern",
+    "agentic-ai",
+    "ai-agent",
+    "qwen3-vl",
+    "vision-language-model",
+    "vlm",
+    "lora",
+    "peft",
+    "open-source-vision",
+    "mlx",
+    "apple-silicon",
+    "cli",
+    "gpt-4v-alternative",
+    "gpt-4o-alternative",
+    "claude-vision-alternative"
+  ],
+  "author": "Rene Zander <renezander030@gmail.com>",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/renezander030/browserground"
+  },
+  "homepage": "https://huggingface.co/renezander030/browserground"
+}

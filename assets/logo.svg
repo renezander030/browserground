@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0e1b2c"/>
+      <stop offset="100%" stop-color="#1a2e4f"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <!-- background -->
+  <rect width="256" height="256" rx="48" fill="url(#bg)"/>
+  <!-- crosshair reticle (the "ground" in browserground) -->
+  <g stroke="#e8b04a" stroke-width="4" fill="none" filter="url(#glow)">
+    <circle cx="128" cy="128" r="62" stroke-dasharray="6 8"/>
+    <line x1="128" y1="50"  x2="128" y2="86"/>
+    <line x1="128" y1="170" x2="128" y2="206"/>
+    <line x1="50"  y1="128" x2="86"  y2="128"/>
+    <line x1="170" y1="128" x2="206" y2="128"/>
+  </g>
+  <!-- bbox brackets (the JSON output we emit) -->
+  <g stroke="#e8b04a" stroke-width="6" fill="none" stroke-linecap="square">
+    <path d="M 96 110 L 96 96 L 118 96"/>
+    <path d="M 138 96 L 160 96 L 160 110"/>
+    <path d="M 96 146 L 96 160 L 118 160"/>
+    <path d="M 138 160 L 160 160 L 160 146"/>
+  </g>
+  <!-- center dot (predicted click point) -->
+  <circle cx="128" cy="128" r="7" fill="#e8b04a"/>
+</svg>
