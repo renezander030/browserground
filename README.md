@@ -130,10 +130,6 @@ Pure-cloud AI agents are bottlenecked on vision-LLM cost and latency. Open-sourc
 
 Apache 2.0.
 
-## Author
-
-[René Zander](https://github.com/renezander030). Issues + PRs welcome.
-
 ---
 
 ```bibtex
