@@ -126,19 +126,6 @@ More in v0.2.
 
 Pure-cloud AI agents are bottlenecked on vision-LLM cost and latency. Open-source 2B–7B specialist models can match cloud LLMs on narrow tasks (UI-TARS-2B hits 89.5% on ScreenSpot-v2 vs GPT-4o's 18.3%). The **composition pattern** — specialist local models for narrow tasks + cloud LLMs for general reasoning — is the cost-effective architecture for 2026 AI agents. browserground is one specialist piece. Bring your own orchestrator.
 
-## Work with me
-
-This adapter is a public reference of the recipe I deliver to freelance clients: small, fast, structured-output local specialists that slot into compound-AI agent stacks and cut cloud-LLM bills without losing capability.
-
-If you need one of these, I can build it:
-
-- a **UI-grounding model trained on your own product's screenshots** — your dashboard, your app, your customer interfaces — for higher recall on the elements your agents actually click
-- a **hybrid agent architecture** routing narrow tasks (grounding, OCR, classification, embedding, extraction) to local specialists, reserving cloud frontier LLMs for the reasoning that actually needs them
-- an **on-prem agent deployment** — Apple Silicon (MLX), CUDA box, or your existing K8s — with no screenshots leaving your infrastructure
-- a **structured-output evaluation harness** that tells you when the local model is actually good enough to replace the cloud call in production
-
-Reach out: <https://renezander.com>
-
 ## License
 
 Apache 2.0.
