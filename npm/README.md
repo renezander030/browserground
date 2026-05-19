@@ -136,10 +136,6 @@ v0.1 = one-epoch / 12k-example LoRA. v0.2 (Tier 2, target ≥ 60%) in developmen
 - 💻 Source: <https://github.com/renezander030/browserground>
 - 📦 npm: <https://www.npmjs.com/package/browserground>
 
-## Work with me
-
-Built by **Rene Zander**, freelance AI engineer (DE/EN, remote). Custom local specialists, hybrid AI agent architectures, on-prem LLM deployments — <https://renezander.com>.
-
 ## License
 
 Apache 2.0.

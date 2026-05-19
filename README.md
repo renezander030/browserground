@@ -18,12 +18,6 @@
 
 ---
 
-> **Want a specialist local model for *your* agent stack?**
-> Built by **Rene Zander**, freelance AI engineer (DE/EN, remote). Custom fine-tunes, hybrid-AI architectures, on-prem deployments.
-> → Reach out via **[renezander.com](https://renezander.com)**
-
----
-
 ## The hybrid AI argument
 
 Today, most AI agents route **every** screenshot to a cloud frontier model (GPT-4V, Claude Vision, Gemini) — just to figure out *where to click*. That's a $0.01–0.05 multimodal call adding 800ms–2s of round-trip latency, repeated 20–50 times per agent run. The bill compounds. The latency compounds. And screenshots full of private UI leave your machine.
