@@ -22,7 +22,7 @@ Today, most AI agents route **every** screenshot to a cloud frontier model (GPT-
 
 A general 200B-parameter LLM is **overkill** for "where is the Submit button?" — that's a narrow vision task. The right shape is a **hybrid one**: cheap fast specialist local models for the dedicated tasks they handle better, and a cloud LLM only for the planning and reasoning it's uniquely good at.
 
-That's exactly what **browserground** is — the click-grounding specialist you drop in next to your Claude / GPT-4o / Codex agent.
+That's exactly what **browserground** is — the click-grounding specialist you drop in next to your Claude / GPT-5 / Codex agent.
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/renezander030/browserground/main/assets/hybrid-architecture.svg" alt="Hybrid AI agent architecture: a local specialist grounds the click target; cloud LLM does planning only" width="900"/>
@@ -115,19 +115,23 @@ ScreenSpot-v2 point-grounding accuracy (300 items, 100/split):
 
 | Model | Params | Overall | Mobile |
 |---|---:|---:|---:|
-| GPT-4o (cloud) | — | 18.3% | — |
-| **browserground v0.1** | **2 B** | **45.3%** | **64.0%** |
+| GPT-5.4 (cloud frontier) ¹ | — | 85.4% | — |
+| **browserground v0.2** | **2 B** | **60.0%** | **78.0%** |
 | SeeClick | 9.6 B | 55.1% | — |
 | ShowUI-2B | 2 B | 75.5% | — |
 | UI-TARS-2B-SFT | 2 B | 89.5% | — |
 
-v0.1 = one-epoch / 12k-example LoRA. v0.2 (Tier 2, target ≥ 60%) in development.
+¹ GPT-5.4 score is on the harder ScreenSpot-Pro benchmark (no public v2 number for the 2026 cloud generation).
+
+When **browserground beats UI-TARS-2B-SFT** for your stack — even though UI-TARS scores higher overall: newer Qwen3-VL base, strict-JSON output (100% parseable, no regex), browser-focused training mix, CLI-first distribution, designed as a hybrid-AI piece (not a standalone agent toolkit).
+
+v0.2 = 26k mixed-domain records, rank-32 LoRA, 1 epoch, ~$2.20 compute.
 
 ## Limitations
 
-- v0.1 desktop & web accuracy lag mobile (training mix is mobile-heavy)
+- Icon UI accuracy (~41%) lags text UI (~74%) — icons need more visual exposure in training
 - English-only training data
-- Single-target per call (batch mode in v0.2)
+- Single-target per call (batch mode planned)
 - No mouse-action prediction (only location — pair with an action predictor for full computer-use loops)
 
 ## Links

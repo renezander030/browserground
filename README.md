@@ -38,23 +38,40 @@ That's exactly what **browserground** is — the click-grounding specialist.
 | Screenshots leave machine | yes | **no** |
 | Rate limits | yes | **no** |
 
-## Status: v0.1 (Tier 1.5 LoRA)
+## Status: v0.2
 
 ScreenSpot-v2 point-grounding accuracy (300 items, 100/split):
 
 | Model | Params | Overall | Mobile | Desktop | Web | Format-OK |
 |---|---:|---:|---:|---:|---:|---:|
-| GPT-4o (cloud) | — | 18.3% | — | — | — | — |
-| **browserground v0.1** | **2 B** | **45.3%** | **64.0%** | 28.0% | 44.0% | **100%** |
+| GPT-5.4 (cloud frontier) ¹ | — | 85.4% | — | — | — | — |
+| **browserground v0.2** | **2 B** | **60.0%** | **78.0%** | 44.0% | 58.0% | **100%** |
 | SeeClick | 9.6 B | 55.1% | — | — | — | — |
 | ShowUI-2B | 2 B | 75.5% | — | — | — | — |
 | UI-TARS-2B-SFT | 2 B | 89.5% | — | — | — | — |
 | OS-Atlas-Base-7B | 7 B | ~91% | — | — | — | — |
-| zero-shot Qwen3-VL-2B | 2 B | 6.3% | 7.0% | 6.0% | 6.0% | 100% |
+| zero-shot Qwen3-VL-2B (no fine-tune) | 2 B | 6.3% | 7.0% | 6.0% | 6.0% | 100% |
 
-- Beats **GPT-4o by 2.5×** and zero-shot Qwen3-VL by **7×** on the same benchmark
-- **100% strict-JSON format compliance** — no fences, no commentary
-- v0.2 (target ≥ 60%) on the roadmap
+¹ GPT-5.4 score is on the harder **ScreenSpot-Pro** benchmark (no public v2 number for the 2026 cloud generation). v2 is significantly easier, so the cloud frontier likely scores 90%+ on v2 if independently benchmarked. Open-source numbers in the table use v2 throughout.
+
+- **+10× over zero-shot baseline** on the same benchmark (6.3% → 60.0%)
+- **Beats SeeClick (9.6B) at 2B params** — 4.8× smaller model, +5 pp accuracy
+- **100% strict-JSON format compliance** — no markdown fences, no commentary, no `<ref>` tokens
+
+### Where browserground beats UI-TARS-2B-SFT
+
+UI-TARS-2B-SFT scores higher on ScreenSpot-v2 overall (89.5%) — but it's a different product. Here's where browserground is a better fit:
+
+| | browserground v0.2 | UI-TARS-2B-SFT |
+|---|---|---|
+| Base model | Qwen3-VL-2B (2025) | Qwen2-VL-2B (2024) |
+| Output format | **Strict JSON `{"bbox_2d": [...]}` — 100% parseable** | Coord strings inside prose — needs parsing/regex |
+| Training mix | Browser + macOS + Android (web-weighted for the actual agent workload) | OS-general; no browser-platform emphasis |
+| Distribution | CLI-first; `npm install -g browserground`; MLX-ready | Server-class; no first-class Mac story |
+| Design | A piece of a hybrid AI stack (one specialist among many) | Standalone agent toolkit |
+| License + base lineage | Apache 2.0 on a current-gen base | Apache 2.0 on a year-old base |
+
+Pick UI-TARS when you want a complete agent toolkit and don't mind running the bigger ecosystem. Pick browserground when you're composing your own hybrid AI stack and need a small, fast, strict-JSON grounding specialist that drops into a CLI / npm workflow on a laptop.
 
 ## Quick start
 
@@ -107,24 +124,26 @@ def ground(screenshot_path, target):
 ## How it works
 
 - Base: [`Qwen/Qwen3-VL-2B-Instruct`](https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct)
-- Method: LoRA rank 16 (17.4 M trainable params, 0.81% of base) on all linear modules of the LM
-- Training mix (12k records): 4k OS-Atlas macOS desktop + 4k Android + 4k UIBert mobile
+- Method: LoRA rank 32 (34.9 M trainable params, 1.6% of base) on all linear modules of the LM
+- Training mix (26k records): 6k OS-Atlas macOS desktop + 6k Android (aw_mobile) + 6k UIBert mobile + 8k wave-ui browser
+- Schedule: 1 epoch, bf16, LR 1e-4 cosine, batch 1 × grad-accum 8, ~4.5 hr on a single RTX A6000
 - Output: strict JSON `{"bbox_2d": [x1, y1, x2, y2]}` — system prompt + LoRA produce 100% parseable output
 
 Training scripts and eval JSONs: [renezander030/imgparse-tier1](https://github.com/renezander030/imgparse-tier1) (private — request access).
 
 ## What's planned
 
-- **v0.2** — Tier 2 LoRA: 26k mixed incl. web, rank 32, 2 epochs, target ScreenSpot-v2 ≥ 60%
-- **MLX-native build** — ~1-2s on Apple Silicon (currently ~14s via MPS+transformers)
-- **GGUF build** — for llama.cpp / Ollama
-- **Batch mode** — many targets per screenshot in one call
+- **MLX-native build** — ~1–2 s on Apple Silicon (currently ~14 s via MPS+transformers)
+- **GGUF build** + **Ollama Modelfile** — `ollama run browserground`
+- **Batch mode** — `--targets file.txt`, many targets per screenshot in one call
+- **Confidence output** — `{bbox_2d, confidence, alternatives}` for retry/fallback logic
+- **PyPI package** — `pip install browserground`
 
 More in v0.2.
 
 ## Why this exists
 
-Pure-cloud AI agents are bottlenecked on vision-LLM cost and latency. Open-source 2B–7B specialist models can match cloud LLMs on narrow tasks (UI-TARS-2B hits 89.5% on ScreenSpot-v2 vs GPT-4o's 18.3%). The **composition pattern** — specialist local models for narrow tasks + cloud LLMs for general reasoning — is the cost-effective architecture for 2026 AI agents. browserground is one specialist piece. Bring your own orchestrator.
+Pure-cloud AI agents are bottlenecked on vision-LLM cost and latency. Open-source 2B specialist models like UI-TARS-2B-SFT (89.5% on ScreenSpot-v2) already match or beat the cloud frontier on narrow grounding tasks at a fraction of the per-call cost. The **composition pattern** — specialist local models for narrow tasks + cloud LLMs for general reasoning — is the cost-effective architecture for 2026 AI agents. browserground is one specialist piece. Bring your own orchestrator.
 
 ## License
 

@@ -30,7 +30,7 @@ datasets:
   <img src="https://raw.githubusercontent.com/renezander030/browserground/main/assets/logo.svg" alt="browserground logo" width="120" height="120"/>
 </p>
 
-# browserground — Qwen3-VL-2B LoRA for hybrid AI agents (v0.1)
+# browserground — Qwen3-VL-2B LoRA for hybrid AI agents (v0.2)
 
 > **The local UI-grounding specialist for hybrid AI agents.** Drop in a screenshot + text target, get a strict JSON bbox. 2B params. MLX-native. Apache 2.0.
 
@@ -76,19 +76,36 @@ Point-grounding accuracy, 300 held-out items (100 per split: mobile / desktop / 
 
 | Model | Params | Overall | Mobile | Desktop | Web | Format-OK |
 |---|---:|---:|---:|---:|---:|---:|
-| GPT-4o (cloud) | — | 18.3% | — | — | — | — |
+| GPT-5.4 (cloud frontier) ¹ | — | 85.4% | — | — | — | — |
 | SeeClick (Qwen-VL-Chat) | 9.6B | 55.1% | — | — | — | — |
 | ShowUI-2B | 2B | 75.5% | — | — | — | — |
 | UI-TARS-2B-SFT (ByteDance) | 2B | 89.5% | — | — | — | — |
 | OS-Atlas-Base-7B | 7B | ~91% | — | — | — | — |
-| **browserground v0.1 (this model)** | **2B** | **45.3%** | **64.0%** | **28.0%** | **44.0%** | **100%** |
+| **browserground v0.2 (this model)** | **2B** | **60.0%** | **78.0%** | **44.0%** | **58.0%** | **100%** |
 | Qwen3-VL-2B-Instruct (zero-shot baseline) | 2B | 6.3% | 7.0% | 6.0% | 6.0% | 100% |
 
-- Beats **GPT-4o by 2.5×** and zero-shot Qwen3-VL by **7×** on the same benchmark
-- **100% strict-JSON format compliance** — no markdown fences, no commentary
-- Sits below ShowUI/UI-TARS at this v0.1; v0.2 (Tier 2, target ≥ 60%) on the roadmap
+¹ GPT-5.4 score is on the harder **ScreenSpot-Pro** benchmark — no public ScreenSpot-v2 number for the 2026 cloud generation. Open-source numbers in the table use v2 throughout.
 
-Numbers for SeeClick / ShowUI / UI-TARS / OS-Atlas are from the OS-Atlas paper's reported ScreenSpot-v2 leaderboard.
+- **+10× over zero-shot baseline** on the same benchmark (6.3% → 60.0%)
+- **Beats SeeClick (9.6B) at 4.8× smaller** — 2B params, +5 pp accuracy
+- **100% strict-JSON format compliance** — no markdown fences, no `<ref>` tokens, parseable every time
+
+### Where browserground beats UI-TARS-2B-SFT
+
+UI-TARS-2B-SFT scores higher on overall accuracy (89.5%). That's a different product. Here's where this model is the better fit:
+
+| | browserground v0.2 | UI-TARS-2B-SFT |
+|---|---|---|
+| Base model | Qwen3-VL-2B (2025) | Qwen2-VL-2B (2024) |
+| Output format | **Strict `{"bbox_2d": [...]}` — 100% parseable** | Coord strings inside prose — needs regex/parsing |
+| Training mix | Browser + macOS + Android (web-weighted for actual agent workloads) | OS-general; no browser-platform emphasis |
+| Distribution | CLI-first; `npm install -g browserground`; MLX-ready | Server-class; no first-class Mac story |
+| Design intent | A piece of a hybrid AI stack (one specialist among many) | Standalone agent toolkit |
+| License + base lineage | Apache 2.0 on current-gen base | Apache 2.0 on a year-old base |
+
+Pick UI-TARS when you want a complete agent toolkit and don't mind the heavier ecosystem. Pick browserground when you're composing your own hybrid AI stack and need a small, fast, strict-JSON grounding specialist that drops into a CLI / npm workflow on a laptop.
+
+Numbers for SeeClick / ShowUI / UI-TARS / OS-Atlas are from the OS-Atlas paper's reported ScreenSpot-v2 leaderboard. GPT-5.4 reference is from the BenchLM ScreenSpot-Pro leaderboard (April 2026).
 
 ## Quick start
 
@@ -132,19 +149,20 @@ out = model.generate(**inputs, max_new_tokens=64, do_sample=False)
 print(processor.tokenizer.decode(out[0, inputs.input_ids.shape[1]:], skip_special_tokens=True))
 ```
 
-## Training recipe
+## Training recipe (v0.2)
 
 - **Base**: `Qwen/Qwen3-VL-2B-Instruct`
-- **Method**: LoRA rank 16, alpha 32, dropout 0.05, on all 7 linear modules of the LM (q/k/v/o/gate/up/down)
-- **Trainable params**: 17.4 M (0.81% of base)
-- **Data mix (12k examples)**:
-  - OS-Atlas-Data desktop_domain (macOS): 4k
-  - OS-Atlas-Data mobile_domain (aw_mobile, Android): 4k
-  - OS-Atlas-Data mobile_domain (UIBert): 4k
+- **Method**: LoRA rank 32, alpha 64, dropout 0.05, on all 7 linear modules of the LM (q/k/v/o/gate/up/down)
+- **Trainable params**: 34.9 M (1.6% of base)
+- **Data mix (26k examples)**:
+  - OS-Atlas-Data desktop_domain (macOS): 6k
+  - OS-Atlas-Data mobile_domain (aw_mobile, Android): 6k
+  - OS-Atlas-Data mobile_domain (UIBert): 6k
+  - agentsea/wave-ui (web-platform-filtered): 8k
 - **Hyperparams**: bf16, LR 1e-4, cosine schedule, batch 1 × grad-accum 8 (effective batch 8), 1 epoch, gradient checkpointing on
-- **Hardware**: 1× L40S 48 GB (RunPod Secure Cloud)
-- **Compute cost**: ~$2 training + ~$0.50 eval
-- **Wall time**: ~2 hr total
+- **Hardware**: 1× RTX A6000 48 GB (RunPod Secure Cloud)
+- **Compute cost**: ~$2.20 training + ~$0.30 eval
+- **Wall time**: ~4.5 hr training + ~5 min eval
 
 Full training scripts (private repo, request access): [renezander030/imgparse-tier1](https://github.com/renezander030/imgparse-tier1).
 
@@ -159,7 +177,7 @@ Full training scripts (private repo, request access): [renezander030/imgparse-ti
 ## Limitations & next
 
 - **Web and desktop accuracy** lag mobile (we trained primarily on macOS + mobile UI). v0.2 adds 8k+ web records and ~2× total data.
-- **Long-tail icon recognition** is weaker than text grounding.
+- **Icon UI accuracy (~41%) lags text UI (~74%)** — icons need more visual exposure in training; planned for v0.3.
 - **No mouse-action prediction** — this model only locates; doesn't decide click vs hover vs type. Pair with an action predictor for full computer-use loops.
 - **English-only training data**.
 

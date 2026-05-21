@@ -1,6 +1,6 @@
 {
   "name": "browserground",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Local UI-grounding specialist for hybrid AI agents. Screenshot + text target \u2192 strict JSON bbox. Qwen3-VL-2B LoRA. Drop-in for Claude Code, Codex, browser-use, Skyvern. Cuts GPT-4V cost & latency on click grounding.",
   "type": "module",
   "bin": {
