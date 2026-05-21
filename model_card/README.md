@@ -40,42 +40,42 @@ datasets:
 
 ---
 
-## TL;DR — why browserground, not the other 2B grounding models
+## TL;DR — when to use browserground (and when to use UI-TARS-MLX instead)
 
-You already know the hybrid-AI argument: don't pay frontier-vision rates for "where is the button?" There are three good 2B specialists for that job — UI-TARS, ShowUI, browserground. Here's the case for picking **this** one.
+If you're on Apple Silicon with ≥16 GB RAM and you need **generic, max-accuracy UI grounding**, use **[mlx-community/UI-TARS-1.5-7B-4bit](https://huggingface.co/mlx-community/UI-TARS-1.5-7B-4bit)**. It's the obvious default — ~94% on ScreenSpot-v2, MLX-native, drops into `mlx-vlm` directly. ByteDance research-lab compute, you couldn't reproduce it on a budget.
 
-| | browserground v0.3 | UI-TARS-2B-SFT | ShowUI-2B |
-|---|---|---|---|
-| ScreenSpot-v2 (overall) | 60.0% | **89.5%** | 75.5% |
-| **Output format** | ✅ **strict JSON `{"bbox_2d": [...]}`, 100% parseable** | ❌ coord strings inside prose — needs regex | ❌ varies by prompt |
-| **Apple Silicon native** | ✅ MLX 4-bit, Ollama, GGUF | ❌ server-class | ❌ server-class |
-| **Distribution** | ✅ npm + pip + Ollama + HF, one install per stack | HF only | HF only |
-| **Daemon / HTTP REST** | ✅ `serve --http :8401`, Ollama-shape API | ❌ | ❌ |
-| **Batch + confidence + eval CLIs** | ✅ built-in | ❌ | ❌ |
-| **Adapters** | ✅ `browser-use` Controller + Skyvern `ground_with_fallback` | ❌ DIY | ❌ DIY |
-| Base model | Qwen3-VL-**2025** | Qwen2-VL-2024 | Qwen2-VL-2024 |
-| Training compute | $2.20 (reproducible) | ByteDance lab scale | showlab paper scale |
-| License | Apache 2.0 | Apache 2.0 | Apache 2.0 |
+browserground is for two narrower jobs:
 
-**The honest take on accuracy.** Yes, UI-TARS scores 89.5% to our 60.0% on ScreenSpot-v2 overall. That gap is a **training-data-and-compute gap**, not an architecture gap. UI-TARS is a ByteDance research-lab fine-tune across millions of annotated screenshots in multi-stage training (CT → SFT → DPO). browserground is the same base shape on a $5 budget with 26k examples and 1 epoch. Reaching ~89% is reproducible with ~$200–500 of compute and 250k records on the same recipe.
+### 1. The recipe for *your product's* custom UI grounder
 
-**Why ship at 60% anyway?** Because you don't use a 2B local model as a standalone cloud replacement. You use it as a router-stage primitive:
+UI-TARS is a finished model. You can use it; you can't easily extend it. The training pipeline is closed, the data mix is proprietary, the base is non-trivial to swap.
 
-```python
-from browserground_skyvern import ground_with_fallback
+browserground is the opposite — it's a **template**. Open base (Qwen3-VL-2B), open training scripts, open data mix. Total recipe cost: **$5 of L40S time + 26k examples + a public LoRA**. Swap in your dashboard's screenshots / your customer app / your internal tooling → ship a domain-trained grounder over a weekend. The 60% generic ScreenSpot-v2 score isn't the deliverable; the *recipe* is. A 60-point baseline on generic screens often becomes 85-95% on your own product's narrow surface because the test distribution finally matches the training distribution.
 
-bbox = ground_with_fallback(
-    screen, target,
-    confidence_threshold=0.55,
-    cloud_fallback=your_cloud_vision_fn,  # GPT-4V / Claude Vision / Gemini
-)
-```
+### 2. The smallest viable slot in a multi-model stack
 
-On representative agent workloads, ~70–80% of grounding calls clear the confidence threshold and stay local at $0. The remaining 20–30% — sub-50px icons, ambiguous targets — escalate to cloud. **Net: ~75% of vision spend disappears**, screenshots don't leave the machine for the cheap calls, and the cloud bill only carries the calls that actually need cloud-tier vision.
+| Model | Disk @ 4-bit | RAM at inference |
+|---|---:|---:|
+| UI-TARS-1.5-7B-MLX | ~4 GB | ~5-6 GB |
+| **browserground 4-bit MLX** | **~1 GB** | **~2 GB** |
 
-That's the product. UI-TARS is the "I want one model for everything" answer; browserground is the "I want a fast, structured, MLX-native router primitive that plugs into the npm CLI / pip / Ollama" answer.
+2 GB matters when you're on an 8 GB Mac, or when your agent already runs a 7B planner + an OCR model + an embedding model and you need a small grounder in the same RAM budget. Plus strict JSON output (100% parseable, no regex on prose) — small win, but real.
 
-**On per-split numbers (the 60% breakdown):** mobile-app buttons are at 78%, text-labelled targets are at ~74%, icon-only targets are at ~41%. If your agent mostly clicks labelled buttons (the common case), real-world accuracy is closer to the high end. Icons get fixed in v0.4 with more icon-rich training data.
+**A direct head-to-head benchmark of browserground vs UI-TARS-1.5-7B-MLX on the same Apple Silicon hardware is forthcoming.**
+
+### When NOT to pick browserground
+
+- You're on a Mac with ≥16 GB RAM and want max generic accuracy → use [UI-TARS-1.5-7B-MLX](https://huggingface.co/mlx-community/UI-TARS-1.5-7B-4bit)
+- You're not going to fine-tune for your product, and accuracy is the only thing that matters → use UI-TARS-1.5-7B-MLX
+- You need a complete agent toolkit, not a piece → look at ByteDance's full UI-TARS stack
+
+### When to pick browserground
+
+- You want to ship a **custom UI grounder trained on your product's screenshots** without spending lab-scale money — use the recipe in this repo as a template
+- You're squeezing into a tight RAM budget (8 GB Mac, multi-model hybrid stack)
+- You want a CLI / npm / pip / Ollama distribution layer with daemon, HTTP REST, batch, confidence-routed cloud fallback, eval-on-your-data — and you specifically want it on top of an open recipe you can re-run
+
+Full per-split numbers (60% breakdown): mobile-app buttons 78%, text-labelled targets ~74%, icon-only ~41%. On labelled-button-heavy workloads (the common browser case), real-world accuracy is closer to the high end. Icons get fixed in v0.4 with more icon-rich training data.
 
 ---
 
