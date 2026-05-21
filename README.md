@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./assets/logo.svg" alt="browserground logo" width="120" height="120"/>
+  <img src="./assets/banner-v03.png" alt="browserground v0.3 — local UI-grounding specialist for hybrid AI agents. MLX 4-bit, npm, pip, Ollama. ScreenSpot-v2 60%. Strict JSON output." width="100%"/>
 </p>
 
 <h1 align="center">browserground</h1>

@@ -64,7 +64,7 @@
 
   <!-- branch 1: screenshot to LOCAL grounder -->
   <path d="M 200 350 L 410 350" class="arrow-cheap"/>
-  <text x="305" y="338" text-anchor="middle" class="label-stat">local · MLX · 1.8s</text>
+  <text x="305" y="338" text-anchor="middle" class="label-stat">local · MLX target ~1.5–3s</text>
   <text x="305" y="370" text-anchor="middle" class="label-stat">$0 · ~200 tokens out</text>
 
   <!-- local model: browserground -->

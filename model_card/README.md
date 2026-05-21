@@ -31,7 +31,7 @@ datasets:
 ---
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/renezander030/browserground/main/assets/logo.svg" alt="browserground logo" width="120" height="120"/>
+  <img src="https://raw.githubusercontent.com/renezander030/browserground/main/assets/banner-v03.png" alt="browserground v0.3 — local UI-grounding specialist for hybrid AI agents. MLX 4-bit, npm, pip, Ollama. ScreenSpot-v2 60%. Strict JSON output."/>
 </p>
 
 # browserground — Qwen3-VL-2B LoRA for hybrid AI agents (v0.3)

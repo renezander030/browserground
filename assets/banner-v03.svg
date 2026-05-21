@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 420" width="1000" height="420" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0e1b2c"/>
+      <stop offset="100%" stop-color="#1a2e4f"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#e8b04a"/>
+      <stop offset="100%" stop-color="#f0c060"/>
+    </linearGradient>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" />
+    </filter>
+  </defs>
+
+  <!-- background -->
+  <rect width="1000" height="420" fill="url(#bg)"/>
+
+  <!-- subtle accent line -->
+  <rect x="0" y="0" width="1000" height="6" fill="url(#accent)"/>
+
+  <!-- left-side: logo + headline -->
+  <g transform="translate(56, 70)">
+    <!-- small bracketed marker (visual logo stand-in) -->
+    <rect x="0" y="6" width="36" height="36" rx="8" fill="none" stroke="#e8b04a" stroke-width="3"/>
+    <rect x="8" y="14" width="20" height="20" rx="3" fill="#e8b04a"/>
+
+    <text x="54" y="34" font-size="38" font-weight="800" fill="#ffffff" letter-spacing="-0.5">browserground</text>
+    <text x="54" y="58" font-size="14" font-weight="500" fill="#a8b8ce">v0.3 · Apache 2.0 · Qwen3-VL-2B LoRA</text>
+  </g>
+
+  <!-- main headline -->
+  <text x="56" y="160" font-size="32" font-weight="700" fill="#ffffff" letter-spacing="-0.5">The local UI-grounding specialist</text>
+  <text x="56" y="200" font-size="32" font-weight="700" fill="#e8b04a" letter-spacing="-0.5">for hybrid AI agents.</text>
+
+  <!-- subhead -->
+  <text x="56" y="234" font-size="16" font-weight="400" fill="#c8d4e8">Drop in a screenshot + text target → strict JSON bbox.</text>
+  <text x="56" y="256" font-size="16" font-weight="400" fill="#c8d4e8">2B params. MLX-native on Apple Silicon.</text>
+
+  <!-- key differentiator strip -->
+  <g transform="translate(56, 286)">
+    <rect x="0" y="0" width="20" height="20" rx="4" fill="#1a6b32"/>
+    <text x="14" y="15" font-size="13" font-weight="800" fill="#ffffff" text-anchor="middle">✓</text>
+    <text x="32" y="15" font-size="14" font-weight="600" fill="#ffffff">100% strict JSON</text>
+
+    <rect x="170" y="0" width="20" height="20" rx="4" fill="#1a6b32"/>
+    <text x="184" y="15" font-size="13" font-weight="800" fill="#ffffff" text-anchor="middle">✓</text>
+    <text x="202" y="15" font-size="14" font-weight="600" fill="#ffffff">MLX 4-bit</text>
+
+    <rect x="294" y="0" width="20" height="20" rx="4" fill="#1a6b32"/>
+    <text x="308" y="15" font-size="13" font-weight="800" fill="#ffffff" text-anchor="middle">✓</text>
+    <text x="326" y="15" font-size="14" font-weight="600" fill="#ffffff">Router pattern</text>
+
+    <rect x="448" y="0" width="20" height="20" rx="4" fill="#1a6b32"/>
+    <text x="462" y="15" font-size="13" font-weight="800" fill="#ffffff" text-anchor="middle">✓</text>
+    <text x="480" y="15" font-size="14" font-weight="600" fill="#ffffff">$0 / common call</text>
+  </g>
+
+  <!-- bottom: install commands -->
+  <g transform="translate(56, 340)">
+    <rect x="0" y="0" width="900" height="48" rx="8" fill="#08111c" stroke="#2a3e5f" stroke-width="1"/>
+    <text x="14" y="22" font-family="ui-monospace, 'SF Mono', Monaco, monospace" font-size="13" fill="#7fb88d">$</text>
+    <text x="30" y="22" font-family="ui-monospace, 'SF Mono', Monaco, monospace" font-size="13" fill="#e8d4a4">npm install -g browserground</text>
+    <text x="290" y="22" font-family="ui-monospace, 'SF Mono', Monaco, monospace" font-size="13" fill="#7fb88d">$</text>
+    <text x="306" y="22" font-family="ui-monospace, 'SF Mono', Monaco, monospace" font-size="13" fill="#e8d4a4">pip install "browserground[mlx]"</text>
+    <text x="580" y="22" font-family="ui-monospace, 'SF Mono', Monaco, monospace" font-size="13" fill="#7fb88d">$</text>
+    <text x="596" y="22" font-family="ui-monospace, 'SF Mono', Monaco, monospace" font-size="13" fill="#e8d4a4">ollama run renezander030/browserground</text>
+
+    <text x="14" y="40" font-family="ui-monospace, monospace" font-size="11" fill="#a8b8ce">npm · PyPI · Ollama · Hugging Face — three packagings, one model. Apache 2.0.</text>
+  </g>
+
+  <!-- right-side: comparison block (compact) -->
+  <g transform="translate(680, 70)">
+    <rect x="0" y="0" width="260" height="200" rx="10" fill="#0a1422" stroke="#e8b04a" stroke-width="1" opacity="0.95"/>
+    <text x="130" y="26" font-size="13" font-weight="700" fill="#e8b04a" text-anchor="middle">ScreenSpot-v2 · 2B specialists</text>
+
+    <text x="18" y="58" font-size="13" font-weight="500" fill="#c8d4e8">UI-TARS-2B-SFT</text>
+    <text x="242" y="58" font-size="13" font-weight="700" fill="#c8d4e8" text-anchor="end">89.5%</text>
+    <line x1="18" y1="66" x2="242" y2="66" stroke="#2a3e5f" stroke-width="0.5"/>
+
+    <text x="18" y="86" font-size="13" font-weight="500" fill="#c8d4e8">ShowUI-2B</text>
+    <text x="242" y="86" font-size="13" font-weight="700" fill="#c8d4e8" text-anchor="end">75.5%</text>
+    <line x1="18" y1="94" x2="242" y2="94" stroke="#2a3e5f" stroke-width="0.5"/>
+
+    <text x="18" y="114" font-size="13" font-weight="700" fill="#e8b04a">browserground v0.3</text>
+    <text x="242" y="114" font-size="13" font-weight="800" fill="#e8b04a" text-anchor="end">60.0%</text>
+    <line x1="18" y1="122" x2="242" y2="122" stroke="#e8b04a" stroke-width="1"/>
+
+    <text x="18" y="142" font-size="13" font-weight="500" fill="#7a8aa0">SeeClick (9.6B)</text>
+    <text x="242" y="142" font-size="13" font-weight="600" fill="#7a8aa0" text-anchor="end">55.1%</text>
+
+    <text x="130" y="172" font-size="11" font-weight="500" fill="#a8b8ce" text-anchor="middle">UI-TARS = research-lab compute.</text>
+    <text x="130" y="186" font-size="11" font-weight="600" fill="#e8b04a" text-anchor="middle">browserground = $5 reproducible recipe.</text>
+  </g>
+</svg>
