@@ -7,12 +7,16 @@ tags:
   - browser-agent
   - claude-computer-use
   - codex
+  - browser-use
+  - skyvern
   - hybrid-ai
   - compound-ai
   - specialist-model
   - lora
   - peft
   - mlx
+  - gguf
+  - ollama
   - apple-silicon
   - qwen3-vl
   - gpt-4v-alternative
@@ -30,17 +34,17 @@ datasets:
   <img src="https://raw.githubusercontent.com/renezander030/browserground/main/assets/logo.svg" alt="browserground logo" width="120" height="120"/>
 </p>
 
-# browserground — Qwen3-VL-2B LoRA for hybrid AI agents (v0.2)
+# browserground — Qwen3-VL-2B LoRA for hybrid AI agents (v0.3)
 
 > **The local UI-grounding specialist for hybrid AI agents.** Drop in a screenshot + text target, get a strict JSON bbox. 2B params. MLX-native. Apache 2.0.
 
----
+Three packaged builds, one install for every stack:
 
-> **Want a specialist local model for *your* agent stack?**
-> Built by **Rene Zander**, freelance AI engineer (DE/EN, remote). Custom fine-tunes, hybrid-AI architectures, on-prem deployments.
-> → Reach out via **[renezander.com](https://renezander.com)**
-
----
+| Build | Use it for | Install |
+|---|---|---|
+| **MLX 4-bit** ([renezander030/browserground-mlx](https://huggingface.co/renezander030/browserground-mlx)) | Apple Silicon, fastest | `npm install -g browserground` (auto) or `pip install "browserground[mlx]"` |
+| **GGUF Q4_K_M + f16 mmproj** ([renezander030/browserground-gguf](https://huggingface.co/renezander030/browserground-gguf)) | Ollama, llama.cpp | `ollama run renezander030/browserground` |
+| **PEFT LoRA** (this repo) | `transformers`, training, fine-tuning | `pip install "browserground[transformers]"` |
 
 ## Why this exists — the hybrid AI argument
 
@@ -55,7 +59,7 @@ That's exactly what browserground is — the click-grounding specialist.
 | | Pure-cloud (status quo) | Hybrid (+ browserground) |
 |---|---|---|
 | Per-screenshot cost | $0.01–0.05 | **$0** |
-| Latency | 800ms–2s round-trip | **~1.8s local** |
+| Latency | 800ms–2s round-trip | **~1.5s MLX / ~1.8s transformers** |
 | Tokens billed by cloud | 1500+ multimodal | **~40 text** |
 | Screenshots leave machine | yes | **no** |
 | Rate limits | yes | **no** |
@@ -81,7 +85,7 @@ Point-grounding accuracy, 300 held-out items (100 per split: mobile / desktop / 
 | ShowUI-2B | 2B | 75.5% | — | — | — | — |
 | UI-TARS-2B-SFT (ByteDance) | 2B | 89.5% | — | — | — | — |
 | OS-Atlas-Base-7B | 7B | ~91% | — | — | — | — |
-| **browserground v0.2 (this model)** | **2B** | **60.0%** | **78.0%** | **44.0%** | **58.0%** | **100%** |
+| **browserground v0.3** | **2B** | **60.0%** | **78.0%** | **44.0%** | **58.0%** | **100%** |
 | Qwen3-VL-2B-Instruct (zero-shot baseline) | 2B | 6.3% | 7.0% | 6.0% | 6.0% | 100% |
 
 ¹ GPT-5.4 score is on the harder **ScreenSpot-Pro** benchmark — no public ScreenSpot-v2 number for the 2026 cloud generation. Open-source numbers in the table use v2 throughout.
@@ -94,20 +98,22 @@ Point-grounding accuracy, 300 held-out items (100 per split: mobile / desktop / 
 
 UI-TARS-2B-SFT scores higher on overall accuracy (89.5%). That's a different product. Here's where this model is the better fit:
 
-| | browserground v0.2 | UI-TARS-2B-SFT |
+| | browserground v0.3 | UI-TARS-2B-SFT |
 |---|---|---|
 | Base model | Qwen3-VL-2B (2025) | Qwen2-VL-2B (2024) |
 | Output format | **Strict `{"bbox_2d": [...]}` — 100% parseable** | Coord strings inside prose — needs regex/parsing |
 | Training mix | Browser + macOS + Android (web-weighted for actual agent workloads) | OS-general; no browser-platform emphasis |
-| Distribution | CLI-first; `npm install -g browserground`; MLX-ready | Server-class; no first-class Mac story |
+| Distribution | **CLI + Python + Ollama + MLX**; one install per stack | Server-class; no first-class Mac story |
 | Design intent | A piece of a hybrid AI stack (one specialist among many) | Standalone agent toolkit |
 | License + base lineage | Apache 2.0 on current-gen base | Apache 2.0 on a year-old base |
 
-Pick UI-TARS when you want a complete agent toolkit and don't mind the heavier ecosystem. Pick browserground when you're composing your own hybrid AI stack and need a small, fast, strict-JSON grounding specialist that drops into a CLI / npm workflow on a laptop.
+Pick UI-TARS when you want a complete agent toolkit and don't mind the heavier ecosystem. Pick browserground when you're composing your own hybrid AI stack and need a small, fast, strict-JSON grounding specialist that drops into a CLI / npm / pip / Ollama workflow on a laptop.
 
 Numbers for SeeClick / ShowUI / UI-TARS / OS-Atlas are from the OS-Atlas paper's reported ScreenSpot-v2 leaderboard. GPT-5.4 reference is from the BenchLM ScreenSpot-Pro leaderboard (April 2026).
 
 ## Quick start
+
+### npm CLI
 
 ```bash
 npm install -g browserground
@@ -115,9 +121,32 @@ browserground parse screenshot.png --target "Submit button"
 # {"bbox_2d": [344, 612, 478, 658]}
 ```
 
-Full install + agent-stack integration: [github.com/renezander030/browserground](https://github.com/renezander030/browserground).
+Daemon, HTTP server, batch, confidence, eval — all in the CLI. See the [GitHub README](https://github.com/renezander030/browserground) for details.
 
-## Use from Python directly
+### Python
+
+```bash
+pip install "browserground[mlx]"            # Apple Silicon (recommended)
+pip install "browserground[transformers]"   # everywhere else
+```
+
+```python
+from browserground import ground, click_xy
+
+res = ground("screenshot.png", "the green Subscribe button")
+print(res["bbox_2d"])
+
+x, y = click_xy("screenshot.png", "the back arrow")
+```
+
+### Ollama
+
+```bash
+ollama pull renezander030/browserground
+ollama run renezander030/browserground "Locate: Submit button" /path/to/screen.png
+```
+
+### From this LoRA directly (transformers)
 
 ```python
 from transformers import AutoProcessor, Qwen3VLForConditionalGeneration
@@ -149,7 +178,9 @@ out = model.generate(**inputs, max_new_tokens=64, do_sample=False)
 print(processor.tokenizer.decode(out[0, inputs.input_ids.shape[1]:], skip_special_tokens=True))
 ```
 
-## Training recipe (v0.2)
+## Training recipe (v0.2 → v0.3)
+
+v0.3 is the same underlying LoRA as v0.2 — what shipped in v0.3 is **packaging**: MLX 4-bit, GGUF, Ollama, PyPI, browser-use + Skyvern adapters, batch / confidence / HTTP daemon / eval CLI surfaces. Numbers below are the v0.2 training run.
 
 - **Base**: `Qwen/Qwen3-VL-2B-Instruct`
 - **Method**: LoRA rank 32, alpha 64, dropout 0.05, on all 7 linear modules of the LM (q/k/v/o/gate/up/down)
@@ -161,7 +192,6 @@ print(processor.tokenizer.decode(out[0, inputs.input_ids.shape[1]:], skip_specia
   - agentsea/wave-ui (web-platform-filtered): 8k
 - **Hyperparams**: bf16, LR 1e-4, cosine schedule, batch 1 × grad-accum 8 (effective batch 8), 1 epoch, gradient checkpointing on
 - **Hardware**: 1× RTX A6000 48 GB (RunPod Secure Cloud)
-- **Compute cost**: ~$2.20 training + ~$0.30 eval
 - **Wall time**: ~4.5 hr training + ~5 min eval
 
 Full training scripts (private repo, request access): [renezander030/imgparse-tier1](https://github.com/renezander030/imgparse-tier1).
@@ -174,20 +204,27 @@ Full training scripts (private repo, request access): [renezander030/imgparse-ti
 
 — a single-line JSON object with pixel coordinates (top-left origin). No markdown fences, no commentary, no `<ref>` tokens. Verified 100% parseable on the eval set.
 
-## Limitations & next
+With `--confidence`, output extends to:
 
-- **Web and desktop accuracy** lag mobile (we trained primarily on macOS + mobile UI). v0.2 adds 8k+ web records and ~2× total data.
-- **Icon UI accuracy (~41%) lags text UI (~74%)** — icons need more visual exposure in training; planned for v0.3.
-- **No mouse-action prediction** — this model only locates; doesn't decide click vs hover vs type. Pair with an action predictor for full computer-use loops.
-- **English-only training data**.
+```json
+{"bbox_2d": [x1, y1, x2, y2], "confidence": 0.92, "alternatives": [{"bbox_2d": [...]}]}
+```
 
-## Use cases (what's this drop-in for)
+## Use cases
 
 - **Claude Computer Use / Claude Code** screen-grounding tool calls
 - **OpenAI Codex CLI** screen-grounding extension
-- **browser-use / Skyvern** click-targeting (Python adapter in the GitHub repo)
+- **browser-use** click-targeting (drop-in adapter in [GitHub plugins/browser-use/](https://github.com/renezander030/browserground/tree/main/plugins/browser-use))
+- **Skyvern** local-first grounding with cloud fallback (adapter in [GitHub plugins/skyvern/](https://github.com/renezander030/browserground/tree/main/plugins/skyvern))
 - **Custom agent stacks** that need a $0/call grounding step instead of GPT-4V per screenshot
 - **Self-hosted compound-AI systems** with a routing layer (specialist model for grounding, general LLM for planning)
+
+## Limitations & next
+
+- **Web and desktop accuracy** lag mobile. v0.4 will add more web/desktop training data.
+- **Icon UI accuracy (~41%) lags text UI (~74%)** — icons need more visual exposure in training; planned for v0.4.
+- **No mouse-action prediction** — this model only locates; doesn't decide click vs hover vs type. Pair with an action predictor for full computer-use loops.
+- **English-only training data**.
 
 ## Work with me
 
@@ -221,5 +258,5 @@ Apache 2.0, same as the base model `Qwen/Qwen3-VL-2B-Instruct`.
 
 - `Qwen/Qwen3-VL-2B-Instruct` base
 - `OS-Copilot/OS-Atlas-Data` training data
-- `agentsea/wave-ui` (for the upcoming v0.2 web slice)
+- `agentsea/wave-ui` web slice
 - `OS-Copilot/ScreenSpot-v2` evaluation set

@@ -1,0 +1,67 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "browserground"
+version = "0.3.0"
+description = "Local UI-grounding specialist for hybrid AI agents. Drop in a screenshot + text target, get a strict JSON bbox. 2B params, MLX-native, Apache 2.0."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Rene Zander" }]
+keywords = [
+  "ui-grounding", "screen-grounding", "browser-agent",
+  "computer-use", "claude-computer-use", "qwen3-vl",
+  "hybrid-ai", "compound-ai", "specialist-model",
+  "lora", "peft", "mlx", "apple-silicon",
+  "gpt-4v-alternative", "vision-language-model", "vlm",
+  "browser-use", "skyvern", "agent-tools",
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+  "pillow>=10.0",
+]
+
+[project.optional-dependencies]
+# transformers backend (works everywhere, slower)
+transformers = [
+  "torch>=2.4",
+  "transformers>=4.55,<4.60",
+  "peft>=0.13",
+  "huggingface_hub>=0.26",
+  "safetensors",
+  "accelerate",
+]
+# MLX backend (Apple Silicon, ~10x faster)
+mlx = [
+  "mlx>=0.20",
+  "mlx-vlm>=0.5",
+  "huggingface_hub>=0.26",
+]
+
+[project.urls]
+Homepage = "https://github.com/renezander030/browserground"
+Repository = "https://github.com/renezander030/browserground"
+Model = "https://huggingface.co/renezander030/browserground"
+"MLX build" = "https://huggingface.co/renezander030/browserground-mlx"
+"GGUF build" = "https://huggingface.co/renezander030/browserground-gguf"
+
+[project.scripts]
+browserground-py = "browserground.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/browserground"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src/browserground", "README.md", "LICENSE"]

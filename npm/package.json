@@ -1,7 +1,7 @@
 {
   "name": "browserground",
-  "version": "0.2.0",
-  "description": "Local UI-grounding specialist for hybrid AI agents. Screenshot + text target \u2192 strict JSON bbox. Qwen3-VL-2B LoRA. Drop-in for Claude Code, Codex, browser-use, Skyvern. Cuts GPT-4V cost & latency on click grounding.",
+  "version": "0.3.0",
+  "description": "Local UI-grounding specialist for hybrid AI agents. Screenshot + text target \u2192 strict JSON bbox. Qwen3-VL-2B LoRA, MLX 4-bit + GGUF + Ollama builds. Daemon, HTTP server, batch, confidence, eval. Drop-in for Claude Code, Codex, browser-use, Skyvern. Cuts GPT-4V cost & latency on click grounding.",
   "type": "module",
   "bin": {
     "browserground": "./bin/browserground.js"
@@ -51,6 +51,13 @@
     "mlx",
     "apple-silicon",
     "cli",
+    "daemon",
+    "gguf",
+    "ollama",
+    "llama-cpp",
+    "batch-inference",
+    "rest-api",
+    "http-daemon",
     "gpt-4v-alternative",
     "gpt-4o-alternative",
     "claude-vision-alternative"

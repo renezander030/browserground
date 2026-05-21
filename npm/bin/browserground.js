@@ -14,8 +14,15 @@ function help() {
   console.log(`browserground — local UI grounding for AI agents
 
 Usage:
-  browserground parse <image> --target "<element description>"   parse one image
-  browserground serve                                            run as daemon
+  browserground parse <image> --target "<description>"           parse one image
+  browserground parse <image> --targets targets.txt              batch: many targets, one image (jsonl with --jsonl)
+  browserground parse --targets pairs.json                       batch: JSON list of {image,target}
+  browserground parse <image> --target "..." --confidence        include sequence confidence
+  browserground parse <image> --target "..." --alternatives 2    emit alternate bbox guesses
+  browserground serve                                            unix-socket daemon (CLI fast-path)
+  browserground serve --http :8401                               HTTP REST daemon
+  browserground eval <targets.json>                              run benchmark over a labeled set
+  browserground eval <dir> <targets.json>                        resolve relative image paths against <dir>
   browserground stop                                             stop daemon
   browserground status                                           daemon + cache state
 
@@ -23,11 +30,17 @@ Examples:
   browserground parse screen.png --target "Submit button"
   browserground serve &
   browserground parse a.png --target "Chrome icon"
+  browserground parse a.png --targets queries.txt --jsonl
+  browserground serve --http :8401 &
+  curl -s localhost:8401/api/health
+  browserground eval ./screenshots ./eval-targets.json --out eval-report.json
   browserground stop
 
 Model auto-downloads on first call (~4.3 GB base + 67 MB adapter to ~/.cache/huggingface/).
+Apple Silicon? Set BROWSERGROUND_MODEL=mlx to use the MLX 4-bit build (~10x faster).
 Docs:    https://github.com/renezander030/browserground
 Model:   https://huggingface.co/renezander030/browserground
+MLX:     https://huggingface.co/renezander030/browserground-mlx
 `);
 }
 

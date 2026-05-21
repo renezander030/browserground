@@ -4,3 +4,11 @@ node_modules/
 __pycache__/
 .DS_Store
 dist/
+build/
+_mlx-build/
+_gguf-build/
+_llamacpp/
+pypi/dist/
+pypi/build/
+pypi/*.egg-info/
+pypi/src/*.egg-info/
