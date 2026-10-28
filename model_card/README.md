@@ -81,7 +81,7 @@ Full per-split numbers (60% breakdown): mobile-app buttons 78%, text-labelled ta
 
 ## The hybrid AI argument — for people new to this pattern
 
-Today, most AI agents route **every** screenshot to a cloud frontier model (GPT-4V, Claude Vision, Gemini) just to find click coordinates. That's a $0.01–0.05 multimodal call adding 800ms–2s of latency, repeated 20–50× per agent run. Cost and latency compound. Screenshots full of private UI leave your machine.
+Today, most AI agents route **every** screenshot to a cloud frontier model (GPT-6 Astra, Claude Opus 5.5, Gemini) just to find click coordinates. That's a $0.01–0.05 multimodal call adding 800ms–2s of latency, repeated 20–50× per agent run. Cost and latency compound. Screenshots full of private UI leave your machine.
 
 A general 200B-parameter LLM is overkill for "where is the Submit button?" — that's a narrow vision task. The right shape is a **hybrid one**: cheap fast specialist local models for the dedicated tasks they handle better, and the cloud LLM only for the planning and reasoning it's uniquely good at.
 
@@ -126,15 +126,18 @@ Point-grounding accuracy, 300 held-out items (100 per split: mobile / desktop / 
 
 | Model | Params | Overall | Mobile | Desktop | Web | Format-OK |
 |---|---:|---:|---:|---:|---:|---:|
-| GPT-5.4 (cloud frontier) ¹ | — | 85.4% | — | — | — | — |
-| SeeClick (Qwen-VL-Chat) | 9.6B | 55.1% | — | — | — | — |
-| ShowUI-2B | 2B | 75.5% | — | — | — | — |
-| UI-TARS-2B-SFT (ByteDance) | 2B | 89.5% | — | — | — | — |
-| OS-Atlas-Base-7B | 7B | ~91% | — | — | — | — |
+| GPT-6 Astra (cloud frontier, ScreenSpot-Pro) ¹ | — | 92.7% | — | — | — | — |
+| SeeClick (Qwen-VL-Chat) ² | 9.6B | 55.1% | — | — | — | — |
+| ShowUI-2B ² | 2B | 77.3% | — | — | — | — |
+| UI-TARS-2B-SFT (ByteDance) ² | 2B | 84.7% | — | — | — | — |
+| UI-TARS-7B-SFT (ByteDance) ² | 7B | 91.6% | — | — | — | — |
 | **browserground v0.3** | **2B** | **60.0%** | **78.0%** | **44.0%** | **58.0%** | **100%** |
 | Qwen3-VL-2B-Instruct (zero-shot baseline) | 2B | 6.3% | 7.0% | 6.0% | 6.0% | 100% |
 
-¹ GPT-5.4 score is on the harder **ScreenSpot-Pro** benchmark — no public ScreenSpot-v2 number for the 2026 cloud generation. Open-source numbers in the table use v2 throughout.
+¹ GPT-6 Astra's 92.7% is OpenAI's own figure on the harder **ScreenSpot-Pro** benchmark (launch table, Sept 2026; [reported here](https://www.vellum.ai/blog/claude-opus-5-5-vs-gpt-6-astra)). No 2026 cloud model publishes a ScreenSpot-v2 number, so the row is a reference point, not a like-for-like comparison.
+² UI-TARS-2B and UI-TARS-7B ScreenSpot-v2 from the [UI-TARS paper](https://arxiv.org/abs/2501.12326) (Table 6); SeeClick and ShowUI-2B v2 numbers as reported in [GUI-Actor](https://arxiv.org/abs/2506.03143) and [GUI-Eyes](https://arxiv.org/abs/2601.09770). Earlier versions of this table listed UI-TARS-2B at 89.5%; that figure is UI-TARS-7B on ScreenSpot v1 and has been corrected.
+
+**Where browserground wins over UI-TARS-2B** — UI-TARS-2B scores 24.7 points higher on ScreenSpot-v2 at the same 2B size. browserground is the pick when you need: a newer **Qwen3-VL** base (UI-TARS-2B sits on Qwen2-VL), **strict JSON** output (100% parseable, no regex on prose), a **browser-focused** training mix, a **CLI-first** distribution (npm, pip, Ollama, daemon, HTTP, batch, eval), and a **hybrid-AI piece** that routes low-confidence calls to the cloud instead of a full agent toolkit. And an open recipe you can re-run on your own screenshots.
 
 - **+10× over zero-shot baseline** on the same benchmark (6.3% → 60.0%)
 - **Beats SeeClick (9.6B) at 4.8× smaller** — 2B params, +5 pp accuracy
@@ -207,7 +210,7 @@ out = model.generate(**inputs, max_new_tokens=64, do_sample=False)
 print(processor.tokenizer.decode(out[0, inputs.input_ids.shape[1]:], skip_special_tokens=True))
 ```
 
-## What would it take to reach UI-TARS-level accuracy (~89-90%)?
+## What would it take to reach UI-TARS-level accuracy (~85% at 2B, ~92% at 7B)?
 
 The gap is **compute + data**, not architecture. Concrete recipe to close it:
 
@@ -246,7 +249,7 @@ Full training scripts (private repo, request access): [renezander030/imgparse-ti
 - **OpenAI Codex CLI** screen-grounding extension
 - **browser-use** click-targeting (drop-in adapter in [GitHub plugins/browser-use/](https://github.com/renezander030/browserground/tree/main/plugins/browser-use))
 - **Skyvern** local-first grounding with cloud fallback (adapter in [GitHub plugins/skyvern/](https://github.com/renezander030/browserground/tree/main/plugins/skyvern))
-- **Custom agent stacks** that need a $0/call grounding step for the common-case calls instead of GPT-4V per screenshot
+- **Custom agent stacks** that need a $0/call grounding step for the common-case calls instead of a frontier vision call per screenshot
 - **Self-hosted compound-AI systems** with a routing layer (specialist model for grounding, general LLM for planning)
 
 ## Limitations & next
