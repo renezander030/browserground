@@ -59,9 +59,28 @@ Full per-split numbers (60% breakdown): mobile-app buttons 78%, text-labelled ta
 
 ---
 
+## Benchmark — ScreenSpot-v2
+
+Point-grounding accuracy, 300 held-out items (100 per split). A hit = predicted bbox center inside the ground-truth bbox. Measured on the v0.2 Tier 2 adapter (rank 32, 1 epoch, 26k examples); v0.3 repackages the same weights.
+
+| Model | Params | Overall | Mobile | Desktop | Web | Format-OK |
+|---|---:|---:|---:|---:|---:|---:|
+| GPT-6 Astra (cloud frontier, ScreenSpot-Pro) ¹ | — | 92.7% | — | — | — | — |
+| UI-TARS-7B-SFT (ByteDance) ² | 7B | 91.6% | — | — | — | — |
+| UI-TARS-2B-SFT (ByteDance) ² | 2B | 84.7% | — | — | — | — |
+| ShowUI-2B ² | 2B | 77.3% | — | — | — | — |
+| **browserground v0.3** | **2B** | **60.0%** | **78.0%** | **44.0%** | **58.0%** | **100%** |
+| SeeClick ² | 9.6B | 55.1% | — | — | — | — |
+| Qwen3-VL-2B-Instruct (zero-shot baseline) | 2B | 6.3% | 7.0% | 6.0% | 6.0% | 100% |
+
+¹ GPT-6 Astra's 92.7% is OpenAI's own figure on the harder **ScreenSpot-Pro** benchmark (launch table, Sept 2026; [reported here](https://www.vellum.ai/blog/claude-opus-5-5-vs-gpt-6-astra)). No 2026 cloud model publishes a ScreenSpot-v2 number, so the row is a reference point, not a like-for-like comparison.
+² UI-TARS-2B and UI-TARS-7B ScreenSpot-v2 from the [UI-TARS paper](https://arxiv.org/abs/2501.12326) (Table 6); SeeClick and ShowUI-2B v2 numbers as reported in [GUI-Actor](https://arxiv.org/abs/2506.03143) and [GUI-Eyes](https://arxiv.org/abs/2601.09770). Earlier versions of this table listed UI-TARS-2B at 89.5%; that figure is UI-TARS-7B on ScreenSpot v1 and has been corrected.
+
+**Where browserground wins over UI-TARS-2B** — UI-TARS-2B scores 24.7 points higher on ScreenSpot-v2 at the same 2B size. browserground is the pick when you need: a newer **Qwen3-VL** base (UI-TARS-2B sits on Qwen2-VL), **strict JSON** output (100% parseable, no regex on prose), a **browser-focused** training mix, a **CLI-first** distribution (npm, pip, Ollama, daemon, HTTP, batch, eval), and a **hybrid-AI piece** that routes low-confidence calls to the cloud instead of a full agent toolkit. And an open recipe you can re-run on your own screenshots.
+
 ## The hybrid AI argument — for people new to this pattern
 
-Today, most AI agents route **every** screenshot to a cloud frontier model (GPT-4V, Claude Vision, Gemini) — just to figure out *where to click*. That's a $0.01–0.05 multimodal call adding 800ms–2s of round-trip latency, repeated 20–50 times per agent run. The bill compounds. The latency compounds. And screenshots full of private UI leave your machine.
+Today, most AI agents route **every** screenshot to a cloud frontier model (GPT-6 Astra, Claude Opus 5.5, Gemini) — just to figure out *where to click*. That's a $0.01–0.05 multimodal call adding 800ms–2s of round-trip latency, repeated 20–50 times per agent run. The bill compounds. The latency compounds. And screenshots full of private UI leave your machine.
 
 A general-purpose 200B-parameter LLM is overkill for the question "where is the Submit button?" — that's a narrow vision task. The right architecture is a **hybrid one**: cheap fast specialist local models for the dedicated tasks they handle better, and the cloud LLM only for the planning and reasoning it's actually uniquely good at.
 
@@ -210,7 +229,7 @@ Adapter + integration notes: [`plugins/skyvern/`](./plugins/skyvern/).
 
 Training scripts and eval JSONs: [renezander030/imgparse-tier1](https://github.com/renezander030/imgparse-tier1) (private — request access).
 
-## What would it take to reach UI-TARS-level accuracy (~89-90%)?
+## What would it take to reach UI-TARS-level accuracy (~85% at 2B, ~92% at 7B)?
 
 The gap is **compute + data**, not architecture. Concrete recipe to close it:
 

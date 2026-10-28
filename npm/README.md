@@ -21,7 +21,7 @@
 
 ## Why this exists — the hybrid AI argument
 
-Today, most AI agents route **every** screenshot to a cloud frontier model (GPT-4V, Claude Vision, Gemini) just to find click coordinates. That's a $0.01–0.05 multimodal call adding 800ms–2s of latency, repeated 20–50× per agent run. Cost and latency compound. Screenshots full of private UI leave your machine.
+Today, most AI agents route **every** screenshot to a cloud frontier model (GPT-6 Astra, Claude Opus 5.5, Gemini) just to find click coordinates. That's a $0.01–0.05 multimodal call adding 800ms–2s of latency, repeated 20–50× per agent run. Cost and latency compound. Screenshots full of private UI leave your machine.
 
 A general 200B-parameter LLM is **overkill** for "where is the Submit button?" — that's a narrow vision task. The right shape is a **hybrid one**: cheap fast specialist local models for the dedicated tasks they handle better, and a cloud LLM only for the planning and reasoning it's uniquely good at.
 
@@ -143,15 +143,17 @@ ScreenSpot-v2 point-grounding accuracy (300 items, 100/split):
 
 | Model | Params | Overall | Mobile |
 |---|---:|---:|---:|
-| GPT-5.4 (cloud frontier) ¹ | — | 85.4% | — |
+| GPT-6 Astra (cloud frontier, ScreenSpot-Pro) ¹ | — | 92.7% | — |
 | **browserground v0.3** | **2 B** | **60.0%** | **78.0%** |
-| SeeClick | 9.6 B | 55.1% | — |
-| ShowUI-2B | 2 B | 75.5% | — |
-| UI-TARS-2B-SFT | 2 B | 89.5% | — |
+| SeeClick ² | 9.6 B | 55.1% | — |
+| ShowUI-2B ² | 2 B | 77.3% | — |
+| UI-TARS-2B-SFT ² | 2 B | 84.7% | — |
+| UI-TARS-7B-SFT ² | 7 B | 91.6% | — |
 
-¹ GPT-5.4 score is on the harder ScreenSpot-Pro benchmark (no public v2 number for the 2026 cloud generation).
+¹ GPT-6 Astra's 92.7% is OpenAI's own figure on the harder **ScreenSpot-Pro** benchmark (launch table, Sept 2026; [reported here](https://www.vellum.ai/blog/claude-opus-5-5-vs-gpt-6-astra)). No 2026 cloud model publishes a ScreenSpot-v2 number, so the row is a reference point, not a like-for-like comparison.
+² UI-TARS-2B and UI-TARS-7B ScreenSpot-v2 from the [UI-TARS paper](https://arxiv.org/abs/2501.12326) (Table 6); SeeClick and ShowUI-2B v2 numbers as reported in [GUI-Actor](https://arxiv.org/abs/2506.03143) and [GUI-Eyes](https://arxiv.org/abs/2601.09770). Earlier versions of this table listed UI-TARS-2B at 89.5%; that figure is UI-TARS-7B on ScreenSpot v1 and has been corrected.
 
-When **browserground beats UI-TARS-2B-SFT** for your stack — even though UI-TARS scores higher overall: newer Qwen3-VL base, strict-JSON output (100% parseable, no regex), browser-focused training mix, CLI + npm + pip + Ollama distribution, designed as a hybrid-AI piece (not a standalone agent toolkit).
+**Where browserground wins over UI-TARS-2B** — UI-TARS-2B scores 24.7 points higher on ScreenSpot-v2 at the same 2B size. browserground is the pick when you need: a newer **Qwen3-VL** base (UI-TARS-2B sits on Qwen2-VL), **strict JSON** output (100% parseable, no regex on prose), a **browser-focused** training mix, a **CLI-first** distribution (npm, pip, Ollama, daemon, HTTP, batch, eval), and a **hybrid-AI piece** that routes low-confidence calls to the cloud instead of a full agent toolkit. And an open recipe you can re-run on your own screenshots.
 
 ## Limitations
 

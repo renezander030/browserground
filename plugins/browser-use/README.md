@@ -59,7 +59,7 @@ os.environ["BROWSERGROUND_HTTP"] = "http://127.0.0.1:8401"
 
 ## What this saves
 
-| | pure `browser-use` (GPT-4V) | with browserground |
+| | pure `browser-use` (cloud vision model) | with browserground |
 |---|---|---|
 | Vision tokens / step | 1500+ multimodal | 0 (local) |
 | Cost / step | $0.01–0.05 | $0 |
