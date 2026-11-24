@@ -34,12 +34,43 @@ jobs:
           name: npm-trust-proof
           path: npm-trust-proof.json
 
+  verify:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: npm
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+      - name: The tag names the package version
+        run: |
+          PKG="v$(node -p "require('./package.json').version")"
+          if [ "$PKG" != "${GITHUB_REF_NAME}" ]; then
+            echo "tag ${GITHUB_REF_NAME} != package.json ${PKG}" >&2
+            exit 1
+          fi
+      - run: node bin/browserground.js --help
+      - name: The packed tarball installs and runs
+        run: |
+          mkdir -p "$RUNNER_TEMP/packed" "$RUNNER_TEMP/smoke"
+          npm pack --pack-destination "$RUNNER_TEMP/packed"
+          cd "$RUNNER_TEMP/smoke" && npm init -y >/dev/null
+          npm install --ignore-scripts "$RUNNER_TEMP"/packed/browserground-*.tgz
+          npx --no-install browserground --help
+
   npm:
+    needs: verify
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write   # npm trusted publishing + provenance
+    env:
+      PACKAGE_DIR: npm
     defaults:
       run:
         working-directory: npm
@@ -63,8 +94,12 @@ jobs:
       - name: npm 11 for trusted publishing
         run: npm install -g npm@11.12.1
 
-      - name: Publish to npm with provenance
-        run: npm publish --provenance --access public
+      - name: npm publish of each version npm lacks; one npm already serves with the same contents is skipped
+        id: already-published
+        working-directory: ${{ github.workspace }}
+        env:
+          NPM_CONFIG_PROVENANCE: true
+        run: node .github/scripts/npm-publish-new.mjs --dir "$PACKAGE_DIR" --out already-published.json
 
   pypi:
     if: github.event_name == 'push'
